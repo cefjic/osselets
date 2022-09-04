@@ -120,3 +120,78 @@ export const getFinalScores = (
     loser: winner === 1 ? p2Score : p1Score,
   };
 };
+
+export const isLineInTablePerimeter = (lineIndex: number) =>
+  lineIndex >= 0 && lineIndex <= 2;
+
+export const isLineCompleted = (table: Table, lineIndex: number) =>
+  table[lineIndex].length >= 3;
+
+export const getFreeLineIndex = (
+  position: "left" | "right",
+  table: Table,
+  lineIndex: number
+): number => {
+  const nextLineIndex = position === "left" ? lineIndex - 1 : lineIndex + 1;
+  const isInPerimetter = isLineInTablePerimeter(nextLineIndex);
+  const isCompleted = isLineCompleted(table, nextLineIndex);
+  if (isInPerimetter && isCompleted) {
+    return getFreeLineIndex(position, table, nextLineIndex);
+  }
+  return isInPerimetter
+    ? nextLineIndex
+    : isCompleted
+    ? position === "left"
+      ? lineIndex + 1
+      : lineIndex - 1
+    : lineIndex;
+};
+
+export const callActionFromCode = (
+  code: string,
+  submitLine: () => void,
+  goToPosition: (position: "left" | "right") => void
+) => {
+  switch (code) {
+    case "Enter": {
+      submitLine();
+      break;
+    }
+    case "Space": {
+      submitLine();
+      break;
+    }
+    case "KeyA": {
+      goToPosition("left");
+      break;
+    }
+    case "ArrowLeft": {
+      goToPosition("left");
+      break;
+    }
+    case "KeyD": {
+      goToPosition("right");
+      break;
+    }
+    case "ArrowRight": {
+      goToPosition("right");
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+};
+
+export const goToPosition = (
+  position: "left" | "right",
+  table: Table,
+  selectedLineIndex: number,
+  setSelectedLineIndex: (index: number) => void
+) => {
+  const newLineIndex = getFreeLineIndex(position, table, selectedLineIndex);
+
+  if (isLineInTablePerimeter(newLineIndex)) {
+    setSelectedLineIndex(newLineIndex);
+  }
+};

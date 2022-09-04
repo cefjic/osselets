@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Config, Player, Table } from "../interfaces";
-import DiceIcon from "../DiceIcon/DiceIcon";
+import DiceIcon from "./components/DiceIcon/DiceIcon";
 import {
   calculateLinePoints,
   calculateTablePoints,
+  callActionFromCode,
   getAvatarFromConfig,
+  isLineInTablePerimeter,
+  goToPosition,
 } from "../utils";
 
 interface Props {
@@ -24,14 +27,14 @@ const PlayerTable = ({
   currentPlayer,
   onLineClick,
 }: Props) => {
-  const [selectedLineIndex, setSelectedLineIndex] = useState<number>(0);
+  const [selectedLineIndex, setSelectedLineIndex] = useState<number>(-1);
   const { avatar, name } = getAvatarFromConfig(config, playerTable);
 
   const playerTableIsPlaying = playerTable === currentPlayer;
 
   useEffect(() => {
     const submitLine = () => {
-      if (selectedLineIndex >= 0) {
+      if (isLineInTablePerimeter(selectedLineIndex)) {
         const isOk = onLineClick(selectedLineIndex, playerTable);
         if (isOk) {
           setSelectedLineIndex(-1);
@@ -39,60 +42,31 @@ const PlayerTable = ({
       }
     };
 
-    const goToLeftLine = () => {
-      if (selectedLineIndex > 0) {
-        setSelectedLineIndex(selectedLineIndex - 1);
-      }
-    };
-
-    const goToRightLine = () => {
-      if (selectedLineIndex < 2) {
-        setSelectedLineIndex(selectedLineIndex + 1);
-      }
+    const goTo = (position: "left" | "right") => {
+      goToPosition(position, table, selectedLineIndex, setSelectedLineIndex);
     };
 
     const handleKeyDown = ({ code }: KeyboardEvent) => {
       if (playerTableIsPlaying) {
-        switch (code) {
-          case "Enter": {
-            submitLine();
-            break;
-          }
-          case "Space": {
-            submitLine();
-            break;
-          }
-          case "KeyA": {
-            goToLeftLine();
-            break;
-          }
-          case "ArrowLeft": {
-            goToLeftLine();
-            break;
-          }
-          case "KeyD": {
-            goToRightLine();
-            break;
-          }
-          case "ArrowRight": {
-            goToRightLine();
-            break;
-          }
-          default: {
-            break;
-          }
-        }
+        callActionFromCode(code, submitLine, goTo);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
 
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedLineIndex, playerTableIsPlaying, onLineClick, playerTable]);
+  }, [
+    selectedLineIndex,
+    playerTableIsPlaying,
+    onLineClick,
+    playerTable,
+    table,
+  ]);
 
   useEffect(() => {
     if (playerTableIsPlaying) {
-      setSelectedLineIndex(0);
+      goToPosition("right", table, selectedLineIndex, setSelectedLineIndex);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerTableIsPlaying]);
 
   return (
@@ -100,6 +74,7 @@ const PlayerTable = ({
       <div className={`dice ${!playerTableIsPlaying ? "hidden" : ""}`}>
         <DiceIcon value={diceValue} />
       </div>
+      <div className="cross" />
       <div className="player-total">{calculateTablePoints(table)}</div>
       <div className="player-avatar">
         <img src={avatar} alt={name} />
@@ -116,11 +91,18 @@ const PlayerTable = ({
             }`}
           >
             <div className="total">{calculateLinePoints(line)}</div>
-            {line.map((value, i) => (
-              <div key={i}>
-                <DiceIcon value={value} />
-              </div>
-            ))}
+            {[0, 1, 2].map((i) => {
+              const value = line.length > i && line[i];
+              return (
+                <div key={i} className="line-dice">
+                  {value ? (
+                    <DiceIcon value={value} />
+                  ) : (
+                    <div className="empty-dice" />
+                  )}
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>

@@ -1,13 +1,193 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+.table {
+  display: flex;
+}
+
+.line {
+  margin: 0 10px;
+  height: 100px;
+  width: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  background: white;
+  border-radius: 3px;
+}
+
+.line.selected,
+.line:hover {
+  box-shadow: 0 0 0 4px skyblue;
+}
+
+.total {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.player {
+  background: lightGrey;
+  width: 100%;
+  margin: 5px 0;
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 3px;
+}
+
+.player-total {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  background: white;
+  border-radius: 3px;
+  width: 70px;
+  padding: 2px 10px;
+  text-align: right;
+}
+
+.dice {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 10px;
+  background: white;
+  display: flex;
+  border-radius: 3px;
+}
+
+.cross {
+  position: absolute;
+  left: 57px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  width: 35px;
+  height: 10px;
+  opacity: 0.3;
+}
+
+.cross::before {
+  position: absolute;
+  content: "";
+  right: -20px;
+  top: -5px;
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 10px;
+  border-color: transparent transparent transparent white;
+}
+
+.dice svg {
+  opacity: 1;
+  transition: opacity 0.7s;
+}
+
+.dice.hidden svg {
+  opacity: 0;
+}
+
+.player:first-child {
+  transform: rotate(180deg);
+}
+
+.playing-table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s;
+  width: 400px;
+  padding: 5px 10px;
+  background: rgb(238, 238, 238);
+  border-radius: 3px;
+  transform: scale(150%);
+}
+
+.playing-table.rotate {
+  transform: rotate(180deg) scale(150%);
+}
+
+.endgame {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  padding: 40px;
+  border-top: 10px solid lightgrey;
+  border-bottom: 10px solid lightgrey;
+  box-shadow: 0 0 10px grey;
+  background: white;
+  display: flex;
+  justify-content: center;
+}
+
+.avatar {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar img {
+  width: 100px;
+}
+
+.avatar:hover {
+  background: red;
+}
+
+.avatar + .avatar {
+  margin-left: 20px;
+}
+
+.player-avatar {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  width: 70px;
+}
+
+.player-avatar img {
+  width: 70px;
+  border-radius: 3px;
+}
+
+.line-dice {
+  display: flex;
+  margin-bottom: 6px;
+  background: white;
+  border-radius: 2px;
+}
+
+.empty-dice {
+  width: 15px;
+  height: 15px;
+  background: rgb(230, 230, 230);
+  border-radius: 3px;
+}
+
+.game {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
 }
