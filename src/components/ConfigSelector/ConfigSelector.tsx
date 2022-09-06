@@ -30,14 +30,14 @@ const ConfigSelector = ({ onConfigUpdate }: Props) => {
       {freeAvatars.map((playerConfig) => {
         const { name, avatar } = playerConfig;
         return (
-          <div className="avatar" key={name}>
-            <img
-              src={avatar}
-              alt={name}
-              onClick={() => {
-                onAvatarSelect(playerConfig);
-              }}
-            />
+          <div
+            className="avatar"
+            key={name}
+            onClick={() => {
+              onAvatarSelect(playerConfig);
+            }}
+          >
+            <img src={avatar} alt={name} />
             <p>{name}</p>
           </div>
         );

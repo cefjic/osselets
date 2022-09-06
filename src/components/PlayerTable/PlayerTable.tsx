@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Config, Player, Table } from "../interfaces";
 import DiceIcon from "./components/DiceIcon/DiceIcon";
 import {
@@ -8,6 +8,7 @@ import {
   getAvatarFromConfig,
   isLineInTablePerimeter,
   goToPosition,
+  getOccurencesOfNumberInArray,
 } from "../utils";
 
 interface Props {
@@ -32,14 +33,21 @@ const PlayerTable = ({
 
   const playerTableIsPlaying = playerTable === currentPlayer;
 
-  useEffect(() => {
-    const submitLine = () => {
-      if (isLineInTablePerimeter(selectedLineIndex)) {
-        const isOk = onLineClick(selectedLineIndex, playerTable);
+  const handleClick = useCallback(
+    (index: number) => {
+      if (isLineInTablePerimeter(index)) {
+        const isOk = onLineClick(index, playerTable);
         if (isOk) {
           setSelectedLineIndex(-1);
         }
       }
+    },
+    [onLineClick, playerTable]
+  );
+
+  useEffect(() => {
+    const submitLine = () => {
+      handleClick(selectedLineIndex);
     };
 
     const goTo = (position: "left" | "right") => {
@@ -60,6 +68,7 @@ const PlayerTable = ({
     onLineClick,
     playerTable,
     table,
+    handleClick,
   ]);
 
   useEffect(() => {
@@ -83,7 +92,7 @@ const PlayerTable = ({
         {Object.values(table).map((line, index) => (
           <div
             key={index}
-            onClick={() => onLineClick(index, playerTable)}
+            onClick={() => handleClick(index)}
             className={`line ${
               playerTableIsPlaying && selectedLineIndex === index
                 ? "selected"
@@ -93,8 +102,14 @@ const PlayerTable = ({
             <div className="total">{calculateLinePoints(line)}</div>
             {[0, 1, 2].map((i) => {
               const value = line.length > i && line[i];
+              const occ = getOccurencesOfNumberInArray(value || 0, line);
               return (
-                <div key={i} className="line-dice">
+                <div
+                  key={i}
+                  className={`line-dice ${
+                    occ === 2 ? "twice" : occ === 3 ? "thrice" : ""
+                  }`}
+                >
                   {value ? (
                     <DiceIcon value={value} />
                   ) : (
